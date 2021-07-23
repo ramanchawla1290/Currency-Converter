@@ -14,7 +14,6 @@ Developer : Raman Chawla
 
 import tkinter as tk
 
-from tkinter import messagebox
 from tkinter import ttk
 
 import currency_converter as CC
@@ -114,7 +113,7 @@ label_amount = tk.Label(input_frame, text="Amount", font=FONT)
 label_amount.grid(row=1, column=0, padx=2, ipadx=8)
 
 entry_amount = tk.Entry(input_frame, justify=tk.RIGHT, width=8,
-                     textvariable=amount)
+                        textvariable=amount)
 entry_amount.grid(row=1, column=1)
 
 # CENTER Section : FROM Currency

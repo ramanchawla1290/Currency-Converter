@@ -29,18 +29,22 @@ import configparser
 import json
 import requests
 
+from dotenv import load_dotenv
 from sys import argv
+from os import getenv
 
 
 FILE_PATH = "./Files/"
 
 API_DATA = {"CONFIG_FILE": FILE_PATH + "cc_config.INI",
             "NAME": 'CurrencyExchangeAPI',
-            "ACCESS_HEADERS": ("X-RapidAPI-Key", "X-RapidAPI-Host"),
             "URL_HEADER": "URL",
             "URL_HEADER_CURRENCIES": "URL_Quotes"}
 
 CURRENCY_JSON_FILE = FILE_PATH + "currencies.json"
+
+
+load_dotenv("./Files/.env")  # Loading environment variables
 
 
 class CurrencyConverterException(Exception):
@@ -57,12 +61,13 @@ class APIConnection:
 
     def __init__(self, api_dict):
         self.__api = api_dict["NAME"]
-        self.__access_headers = api_dict["ACCESS_HEADERS"]
         self.__config_file = api_dict["CONFIG_FILE"]
         self.__url_header = api_dict["URL_HEADER"]
         self.__url_header_currencies = api_dict["URL_HEADER_CURRENCIES"]
 
         self.config = self.__get_api_config()
+        self.__access_headers = tuple(name.strip()
+                                      for name in self.config['Headers'].split(','))
 
     def __get_api_config(self):
         """Reads configuration file & Returns API configuration"""
@@ -77,7 +82,7 @@ class APIConnection:
     def get_api_access_headers(self):
         """Returns API Headers dictionary required to communicate with API"""
         try:
-            headers = {header: self.config[header]
+            headers = {header: getenv(header)  # Fetching value from environment
                        for header in self.__access_headers}
         except KeyError as ke:
             raise CurrencyConverterException("Invalid API Headers") from ke
@@ -252,7 +257,8 @@ if __name__ == "__main__":
                 print(result)
 
                 print(amount, end=" ")
-                print(f"{code_source} ({cc.get_currency_name(code_source)})", end=" = ")
+                print(
+                    f"{code_source} ({cc.get_currency_name(code_source)})", end=" = ")
                 print(result, end=" ")
                 print(f"{code_target} ({cc.get_currency_name(code_target)})")
 
